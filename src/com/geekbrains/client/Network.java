@@ -2,7 +2,6 @@ package com.geekbrains.client;
 
 import com.geekbrains.CommonConstants;
 import com.geekbrains.server.ServerCommandConstants;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

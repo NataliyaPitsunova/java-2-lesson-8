@@ -1,20 +1,13 @@
 package com.geekbrains.client;
 
 import com.geekbrains.server.ServerCommandConstants;
-
 import javafx.application.Platform;
-
 import javafx.event.ActionEvent;
-
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-
 import javafx.scene.control.*;
-
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-
-
 import java.net.URL;
 import java.util.ResourceBundle;
 
