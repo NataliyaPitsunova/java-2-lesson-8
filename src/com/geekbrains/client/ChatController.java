@@ -1,6 +1,9 @@
 package com.geekbrains.client;
 
+import com.geekbrains.server.ClientHandler;
+import com.geekbrains.server.Server;
 import com.geekbrains.server.ServerCommandConstants;
+import com.geekbrains.server.authorization.JdbcApp;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -8,20 +11,26 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class ChatController implements Initializable {
     @FXML
     private TextArea textArea;
     @FXML
-    private TextField messageField, loginField;
+    private TextField messageField, loginField, changeNickField;
     @FXML
     private HBox messagePanel, authPanel;
     @FXML
     private PasswordField passwordField;
     @FXML
     private ListView<String> clientList;
+    @FXML
+    public HBox changeNickPanel;
 
 
     private final Network network;
@@ -37,6 +46,8 @@ public class ChatController implements Initializable {
         messagePanel.setManaged(authenticated);
         clientList.setVisible(authenticated);
         clientList.setManaged(authenticated);
+        changeNickPanel.setVisible(false);
+        changeNickPanel.setManaged(false);
     }
 
     @Override
@@ -109,6 +120,44 @@ public class ChatController implements Initializable {
     public void handleMouseClick(MouseEvent mouseEvent) {
         String nickName = clientList.getSelectionModel().getSelectedItem();
         messageField.setText(ServerCommandConstants.PRIVATE + " " + nickName + " ");
+    }
+
+    public void changeNick(ActionEvent event) {
+        changeNickPanel.setVisible(true);
+        changeNickPanel.setManaged(true);
+    }
+
+    public void chN(String lastNick, String newNick) {
+        try {
+            JdbcApp.updateEx(lastNick, newNick);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("ошибка обновления ника");
+        }
+    }
+
+    public void setClientList(String lastNick, String newNick) {
+        Platform.runLater(new Runnable() {
+                              @Override
+                              public void run() {
+                                  for (String client : clientList.getItems()) {
+                                      if (client.equals(lastNick)) {
+                                          displayClient(newNick);
+                                          removeClient(lastNick);
+                                      }
+                                  }
+                              }
+                          }
+        );
+    }
+
+
+    public void changeNickOk(ActionEvent event) {
+        network.sendMessage(ServerCommandConstants.CHANGENICK + " " + changeNickField.getText());
+        changeNickPanel.setVisible(false);
+        changeNickPanel.setManaged(false);
+        changeNickField.clear();
+
     }
 }
 

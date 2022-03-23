@@ -3,6 +3,7 @@ package com.geekbrains.server;
 import com.geekbrains.CommonConstants;
 import com.geekbrains.server.authorization.AuthService;
 import com.geekbrains.server.authorization.InMemoryAuthServiceImpl;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -48,7 +49,17 @@ public class Server {
         return false;
     }
 
-    public synchronized void broadcastMessage(String message) {
+    public synchronized void broadcastMessage(String message) throws IOException {
+        if (message.contains(ServerCommandConstants.CHANGENICK)) {
+            for (ClientHandler handler : connectedUsers) {
+                String[] client = message.split(" ");
+                String[] oldN = client[0].split(":");
+                if (handler.getNickName().equals(oldN[0])) {
+                    handler.setNickName(client[2]);
+                    break;
+                }
+            }
+        }
         for (ClientHandler handler : connectedUsers) {
             if (message.contains(ServerCommandConstants.PRIVATE)) {
                 String[] client = message.split(" ");

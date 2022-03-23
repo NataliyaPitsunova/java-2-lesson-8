@@ -11,6 +11,10 @@ public class ClientHandler {
     private final DataInputStream inputStream;
     private final DataOutputStream outputStream;
 
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
     private String nickName;
 
     public String getNickName() {
@@ -79,6 +83,7 @@ public class ClientHandler {
         }
     }
 
+
     public void sendMessage(String message) {
         try {
             outputStream.writeUTF(message);
@@ -87,7 +92,7 @@ public class ClientHandler {
         }
     }
 
-    private void closeConnection() {
+    private void closeConnection() throws IOException {
         server.disconnectUser(this);
         server.broadcastMessage(ServerCommandConstants.EXIT + " " + nickName);
         try {
