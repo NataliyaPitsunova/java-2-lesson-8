@@ -48,7 +48,7 @@ public class Server {
         }
         return false;
     }
-
+    //ДЛОБАВЛЕНО CHANGENICK ДЛЯ ИЗМЕНЕНИЯ В АРРЕЙЛИСТЕ  connectedUsers НИКНЕЙМА
     public synchronized void broadcastMessage(String message) throws IOException {
         if (message.contains(ServerCommandConstants.CHANGENICK)) {
             for (ClientHandler handler : connectedUsers) {
@@ -60,6 +60,7 @@ public class Server {
                 }
             }
         }
+        //КОНЕЦ НОВОВВЕДЕНИЙ
         for (ClientHandler handler : connectedUsers) {
             if (message.contains(ServerCommandConstants.PRIVATE)) {
                 String[] client = message.split(" ");

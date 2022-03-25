@@ -40,14 +40,14 @@ public class Network {
                         } else if (messageFromServer.contains(ServerCommandConstants.PRIVATE)) {
                             String[] client = messageFromServer.split(" ", 5);
                             controller.displayMessage(client[0] + " private " + client[3] + client[4]);
+                            // КОГДА ПРИХОДИТ СООБЩЕНИЕ С СЕРВЕРА CHANGENICK ВЫБИРАЕМ ОТТУДА СТАРЫЙ И НОВЫЙ НИК
+                            // И ОТПРАВЛЯЕМ В ЧАТ КОНТРОЛЛЕР СТАРЫЙ И НОВЫЙ НИК
                         } else if (messageFromServer.contains(ServerCommandConstants.CHANGENICK)) {
                             String[] client = messageFromServer.split(" ");
                             String[] oldN = client[0].split(":");
-                            controller.displayMessage(oldN[0] + " сменил ник на " + client[2]);
-                           // controller.displayClient(client[2]);
-                           // controller.removeClient(oldN[0]);
                             controller.chN(oldN[0], client[2]);
                             controller.setClientList(oldN[0], client[2]);
+                            controller.displayMessage(oldN[0] + " сменил ник на " + client[2]);
                         } else if (messageFromServer.startsWith(ServerCommandConstants.CLIENTS)) {
                             String[] client = messageFromServer.split(" ");
                             for (int i = 1; i < client.length; i++) {
@@ -85,7 +85,6 @@ public class Network {
                 initializeNetwork();
             }
             outputStream.writeUTF(ServerCommandConstants.AUTHENTICATION + " " + login + " " + password);
-
             boolean authenticated = inputStream.readBoolean();
             if (authenticated) {
                 startReadServerMessages();
@@ -94,7 +93,6 @@ public class Network {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return false;
     }
 

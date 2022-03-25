@@ -57,8 +57,6 @@ public class ChatController implements Initializable {
 
 
     public void displayMessage(String text) {
-
-
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -121,12 +119,13 @@ public class ChatController implements Initializable {
         String nickName = clientList.getSelectionModel().getSelectedItem();
         messageField.setText(ServerCommandConstants.PRIVATE + " " + nickName + " ");
     }
-
+    //зАДАНИЕ 2.2
+    // ПОЯВЛЯЕТСЯ ПАНЕЛЬ ДЛЯ ВВОДА НОВОГО НИКА
     public void changeNick(ActionEvent event) {
         changeNickPanel.setVisible(true);
         changeNickPanel.setManaged(true);
     }
-
+    //МЕТОД ВЫЗЫВАЕТ МЕТОД ИЗ КЛАССА JDBC ДЛЯ СМЕНЫ НИКА В БАЗЕ ДАННЫХ
     public void chN(String lastNick, String newNick) {
         try {
             JdbcApp.updateEx(lastNick, newNick);
@@ -136,6 +135,8 @@ public class ChatController implements Initializable {
         }
     }
 
+    //ДЛЯ ЗАМЕНЫ НИКА В ЛИСТВИВЕ, У ВСЕХ КРОМЕ СЕБЯ ПОЯВЛЯЕТСЯ НОВЫЙ НИК
+    //********
     public void setClientList(String lastNick, String newNick) {
         Platform.runLater(new Runnable() {
                               @Override
@@ -151,7 +152,7 @@ public class ChatController implements Initializable {
         );
     }
 
-
+    //МЕТОД ОТПРАВЛЯЕТ СООБЩЕНИЕ НА СЕРВЕР И СКРЫВАЕТ / ОЧИЩАЕТ ПАНЕЛЬ ДЛЯ ВВОДА НОВОГО НИКНЕЙМА
     public void changeNickOk(ActionEvent event) {
         network.sendMessage(ServerCommandConstants.CHANGENICK + " " + changeNickField.getText());
         changeNickPanel.setVisible(false);

@@ -6,5 +6,5 @@ public class ServerCommandConstants {
     public static final String CLIENTS = "/clients";
     public static final String ENTER = "/enter";
     public static final String PRIVATE = "/private";
-    public static final String CHANGENICK = "/changenick";
+    public static final String CHANGENICK = "/changenick"; //новая команда
 }

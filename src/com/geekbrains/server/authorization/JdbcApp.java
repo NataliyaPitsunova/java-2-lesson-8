@@ -3,7 +3,7 @@ package com.geekbrains.server.authorization;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
+//новый класс для работы с psql
 public class JdbcApp {
     private static Connection connection;
     private static Statement statement;
