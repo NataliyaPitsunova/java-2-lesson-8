@@ -22,4 +22,9 @@ public class UserData {
     public String getNickName() {
         return nickName;
     }
+
+    public void info() {
+        System.out.printf("логин: %s, пароль: %s, никнейм: %s" , this.login, this.password, this.nickName);
+        System.out.println();
+    }
 }
