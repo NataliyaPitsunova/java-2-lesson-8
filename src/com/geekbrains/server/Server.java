@@ -1,9 +1,11 @@
 package com.geekbrains.server;
 
 import com.geekbrains.CommonConstants;
+import com.geekbrains.client.ChatController;
 import com.geekbrains.server.authorization.AuthService;
 import com.geekbrains.server.authorization.InMemoryAuthServiceImpl;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -20,8 +22,7 @@ public class Server {
         try (ServerSocket server = new ServerSocket(CommonConstants.SERVER_PORT)) {
             authService.start();
             connectedUsers = new ArrayList<>();
-            while (true) {
-                System.out.println("Сервер ожидает подключения");
+            while (true) {                System.out.println("Сервер ожидает подключения");
                 Socket socket = server.accept();
                 System.out.println("Клиент подключился");
                 new ClientHandler(this, socket);
@@ -70,6 +71,7 @@ public class Server {
                 }
             } else {
                 handler.sendMessage(message);
+                //saveHistory(historyServer,message);
             }
         }
     }

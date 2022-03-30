@@ -4,6 +4,7 @@ import com.geekbrains.server.ClientHandler;
 import com.geekbrains.server.Server;
 import com.geekbrains.server.ServerCommandConstants;
 import com.geekbrains.server.authorization.JdbcApp;
+import com.geekbrains.client.History;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,8 +13,10 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
+import java.io.*;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -32,10 +35,14 @@ public class ChatController implements Initializable {
     @FXML
     public HBox changeNickPanel;
 
+    private String path = "serverHistory.txt";
+    private File file = new File(path);
+    private ArrayList<String> historySrv = new ArrayList<String>();
+    private History history;
 
     private final Network network;
 
-    public ChatController() {
+    public ChatController() throws IOException {
         this.network = new Network(this);
     }
 
@@ -67,6 +74,13 @@ public class ChatController implements Initializable {
                     textArea.setText(text);
                 } else {
                     textArea.setText(textArea.getText() + "\n" + text);
+                    //сериализация истории
+                    try {
+                        history.addMessage(text);
+                        history.serialize();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 if (text.contains(" private ")) {
                     textArea.selectRange(oldText, selectText);
@@ -96,15 +110,34 @@ public class ChatController implements Initializable {
     }
 
 
-    public void sendAuth(ActionEvent event) {
+    public void sendAuth(ActionEvent event) throws IOException {
         boolean authenticated = network.sendAuth(loginField.getText(), passwordField.getText());
         if (authenticated) {
             loginField.clear();
             passwordField.clear();
             setAuthenticated(true);
-
+//3.2 десериализация из файла истории при входе в чат
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            history = new History(file, path, historySrv);
+            try {
+                history.deserialize();
+                historySrv = history.getMessage();
+                for (String log : historySrv
+                ) {
+                    if (!(textArea.getText().isEmpty())) {
+                        textArea.setText(textArea.getText() + "\n" + log);
+                    } else {
+                        textArea.setText(log);
+                    }
+                }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
+
 
     public void sendMessage(ActionEvent event) {
         network.sendMessage(messageField.getText());
@@ -119,12 +152,14 @@ public class ChatController implements Initializable {
         String nickName = clientList.getSelectionModel().getSelectedItem();
         messageField.setText(ServerCommandConstants.PRIVATE + " " + nickName + " ");
     }
+
     //зАДАНИЕ 2.2
     // ПОЯВЛЯЕТСЯ ПАНЕЛЬ ДЛЯ ВВОДА НОВОГО НИКА
     public void changeNick(ActionEvent event) {
         changeNickPanel.setVisible(true);
         changeNickPanel.setManaged(true);
     }
+
     //МЕТОД ВЫЗЫВАЕТ МЕТОД ИЗ КЛАССА JDBC ДЛЯ СМЕНЫ НИКА В БАЗЕ ДАННЫХ
     public void chN(String lastNick, String newNick) {
         try {
@@ -160,5 +195,7 @@ public class ChatController implements Initializable {
         changeNickField.clear();
 
     }
+
+
 }
 
