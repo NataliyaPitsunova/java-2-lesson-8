@@ -5,23 +5,22 @@ import javafx.collections.FXCollections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.geekbrains.server.authorization.JdbcApp.*;
+
 public class InMemoryAuthServiceImpl implements AuthService {
     public final Map<String, UserData> users;
+    //ИСПРАВЛЕН InMemoryAuthServiceImpl ОБРАЩАЕТСЯ к main методу класса jbdc
     public InMemoryAuthServiceImpl() {
         users = new HashMap<>();
-        users.put("login1", new UserData("login1", "password1", "first_user"));
-        users.put("login2", new UserData("login2", "password2", "second_user"));
-        users.put("login3", new UserData("login3", "password3", "third_user"));
-        users.put("login4",new UserData("login4","password4","four_user"));
-       }
-
-
+        main();
+        for (int i = 0; i < logins.size(); i++) {
+            users.put("login"+(i+1), logins.get(i));
+        }
+    }
     @Override
     public void start() {
         System.out.println("Сервис аутентификации инициализирован");
     }
-
-
     @Override
     public synchronized String getNickNameByLoginAndPassword(String login, String password) {
         UserData user = users.get(login);

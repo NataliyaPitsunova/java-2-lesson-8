@@ -1,8 +1,8 @@
 package com.geekbrains.server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import com.geekbrains.client.ChatController;
+
+import java.io.*;
 import java.net.Socket;
 
 public class ClientHandler {
@@ -11,7 +11,14 @@ public class ClientHandler {
     private final DataInputStream inputStream;
     private final DataOutputStream outputStream;
 
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
     private String nickName;
+    private String login;
+
+    private File historyClient;
 
     public String getNickName() {
         return nickName;
@@ -29,6 +36,7 @@ public class ClientHandler {
                     try {
                         authentication();
                         readMessages();
+
                     } catch (IOException exception) {
                         exception.printStackTrace();
                     }
@@ -44,6 +52,7 @@ public class ClientHandler {
             String message = inputStream.readUTF();
             if (message.startsWith(ServerCommandConstants.AUTHENTICATION)) {
                 String[] authInfo = message.split(" ");
+                login = authInfo[1];
                 String nickName = server.getAuthService().getNickNameByLoginAndPassword(authInfo[1], authInfo[2]);
                 if (nickName != null) {
                     if (!server.isNickNameBusy(nickName)) {
@@ -78,16 +87,35 @@ public class ClientHandler {
             server.broadcastMessage(nickName + ": " + messageInChat);
         }
     }
+//сохранение истории пользователя
+    private void saveHistory(String message) throws IOException, ClassNotFoundException {
+        historyClient = new File("history_" + login + ".txt");
+        if (!historyClient.exists()) {
+            historyClient.createNewFile();
+        }
+        try {
+            PrintWriter fileWriter = new PrintWriter(new FileWriter(historyClient, true));
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(message + "\n");
+            bufferedWriter.close();
 
-    public void sendMessage(String message) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void sendMessage(String message) throws IOException {
         try {
             outputStream.writeUTF(message);
-        } catch (IOException exception) {
+            //добавляем в историю
+            saveHistory(message);
+        } catch (IOException | ClassNotFoundException exception) {
             exception.printStackTrace();
         }
     }
 
-    private void closeConnection() {
+    private void closeConnection() throws IOException {
         server.disconnectUser(this);
         server.broadcastMessage(ServerCommandConstants.EXIT + " " + nickName);
         try {

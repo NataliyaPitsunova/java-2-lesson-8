@@ -1,8 +1,11 @@
 package com.geekbrains.server;
 
 import com.geekbrains.CommonConstants;
+import com.geekbrains.client.ChatController;
 import com.geekbrains.server.authorization.AuthService;
 import com.geekbrains.server.authorization.InMemoryAuthServiceImpl;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,8 +22,7 @@ public class Server {
         try (ServerSocket server = new ServerSocket(CommonConstants.SERVER_PORT)) {
             authService.start();
             connectedUsers = new ArrayList<>();
-            while (true) {
-                System.out.println("Сервер ожидает подключения");
+            while (true) {                System.out.println("Сервер ожидает подключения");
                 Socket socket = server.accept();
                 System.out.println("Клиент подключился");
                 new ClientHandler(this, socket);
@@ -47,8 +49,19 @@ public class Server {
         }
         return false;
     }
-
-    public synchronized void broadcastMessage(String message) {
+    //ДЛОБАВЛЕНО CHANGENICK ДЛЯ ИЗМЕНЕНИЯ В АРРЕЙЛИСТЕ  connectedUsers НИКНЕЙМА
+    public synchronized void broadcastMessage(String message) throws IOException {
+        if (message.contains(ServerCommandConstants.CHANGENICK)) {
+            for (ClientHandler handler : connectedUsers) {
+                String[] client = message.split(" ");
+                String[] oldN = client[0].split(":");
+                if (handler.getNickName().equals(oldN[0])) {
+                    handler.setNickName(client[2]);
+                    break;
+                }
+            }
+        }
+        //КОНЕЦ НОВОВВЕДЕНИЙ
         for (ClientHandler handler : connectedUsers) {
             if (message.contains(ServerCommandConstants.PRIVATE)) {
                 String[] client = message.split(" ");
@@ -58,6 +71,7 @@ public class Server {
                 }
             } else {
                 handler.sendMessage(message);
+                //saveHistory(historyServer,message);
             }
         }
     }

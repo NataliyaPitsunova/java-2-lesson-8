@@ -1,0 +1,6 @@
+/clients 
+2_ska: yeeee
+/clients UnclePusi 
+2_ska: edxqmlm
+UnclePusi: xqw
+/exit UnclePusi
