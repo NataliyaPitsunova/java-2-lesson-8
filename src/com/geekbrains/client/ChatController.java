@@ -110,7 +110,7 @@ public class ChatController implements Initializable {
     }
 
 
-    public void sendAuth(ActionEvent event) throws IOException {
+    public void sendAuth(ActionEvent event) throws IOException, RuntimeException {
         boolean authenticated = network.sendAuth(loginField.getText(), passwordField.getText());
         if (authenticated) {
             loginField.clear();
@@ -133,6 +133,8 @@ public class ChatController implements Initializable {
                     }
                 }
             } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (EOFException e){
                 e.printStackTrace();
             }
         }

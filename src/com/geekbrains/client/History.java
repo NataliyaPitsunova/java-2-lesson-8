@@ -39,7 +39,7 @@ public class History implements Serializable {
         }
     }
 
-    public String deserialize() throws IOException, NoClassDefFoundError, ClassNotFoundException, IOException {
+    public String deserialize() throws IOException, NoClassDefFoundError, ClassNotFoundException, IOException,EOFException {
         if (file.length() != 0) {
             try (FileInputStream fIS = new FileInputStream(path);
                  ObjectInputStream oIS = new ObjectInputStream(fIS)) {
